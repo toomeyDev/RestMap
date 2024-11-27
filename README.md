@@ -1,0 +1,1 @@
+# Simple map application relying on Mapbox to support searching for restaurants.
