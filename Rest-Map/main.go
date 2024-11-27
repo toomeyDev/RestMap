@@ -6,9 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"net/http"
+	"os"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Ensure we can grab environment variables from .env (without this, we will be unable to display the map)
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found.")
+	}
+
 	router := gin.Default()
 	router.Use(cors.Default())
 
@@ -38,9 +45,9 @@ func getRestaurants(c *gin.Context) {
 
 func searchRestaurants(chainName, longitude, latitude string) ([]map[string]interface{}, error) {
 	// Build URL for Mapbox API request
-	accessToken := "pk.eyJ1IjoibXRvb21leS1kZXYiLCJhIjoiY200MDRiOWxqMTlzODJ3cHlrejE3NjgzNyJ9.AqCgaLym-Ym9jBSrsj6aGg"
+	accessToken := os.Getenv("MAPBOX_ACCESS_TOKEN")
 	if accessToken == "" {
-		log.Fatal("MAPBOX_ACCESS_TOKEN is not set.")
+		log.Fatal("MAPBOX_ACCESS_TOKEN env variable is not set.")
 	}
 
 	url := "https://api.mapbox.com/geocoding/v5/mapbox.places/" + chainName + ".json" +
@@ -90,9 +97,10 @@ func searchRestaurants(chainName, longitude, latitude string) ([]map[string]inte
 
 		// Collect restaurant information
         restaurant := map[string]interface{}{
-            "name":      f["text"],
-            "address":   properties["address"],
-            "latitude":  coordinates[1],
+            "name": f["text"],
+            "address": properties["address"],
+			"category": properties["category"],
+            "latitude": coordinates[1],
             "longitude": coordinates[0],
         }
 		

@@ -78,9 +78,14 @@
             .then(response => {
               const restaurants = response.data.restaurants;
               restaurants.forEach(restaurant => {
+                const popupContent = `
+                  <strong>${restaurant.name}</strong><br />
+                  ${restaurant.address || 'Address not available'}<br/>
+                  ${restaurant.category || 'Category not available'}
+                `;
                 new mapboxgl.Marker()
                   .setLngLat([restaurant.longitude, restaurant.latitude])
-                  .setPopup(new mapboxgl.Popup().setText(restaurant.name))
+                  .setPopup(new mapboxgl.Popup().setHTML(popupContent))
                   .addTo(this.map);
               });
             })
